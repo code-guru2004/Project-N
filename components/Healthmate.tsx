@@ -29,7 +29,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full p-4 border border-blue-800 rounded-lg my-4">
+      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full p-4  rounded-lg my-4">
         {/* Header */}
         <div className="text-center mb-8 pb-4">
           <h1 className="text-4xl font-bold text-blue-500 mb-2">HealthMate</h1>

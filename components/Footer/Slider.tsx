@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import {
   Menu,
   X,
-  HeartPulse,
-  Activity,
-  Bell,
-  Upload as UploadIcon,
+  MessageSquarePlus,
   Settings,
-  CircleDot,
+  LogOut,
+  HeartPulse
 } from "lucide-react";
 
 const Sidebar: React.FC = () => {
@@ -39,45 +37,30 @@ const Sidebar: React.FC = () => {
           isOpen ? "left-0" : "-left-full"
         }`}
       >
-        {/* HealthMate Header */}
-        <div className="p-6 border-b border-gray-700/10 flex items-center gap-3">
-          <div className="bg-indigo-600 p-2 rounded-lg">
-            <HeartPulse className="text-white w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="font-semibold text-white">HealthMate</h1>
-            <p className="text-xs text-green-400 flex items-center gap-1">
-              <CircleDot className="w-3 h-3" />
-              Online
-            </p>
-          </div>
+        {/* App Header */}
+        <div className="flex flex-row p-6 gap-2 border-b border-gray-700/10">
+        <HeartPulse className="text-indigo-600 w-10 h-10 " />
+          <h1 className="font-semibold text-lg text-white">Healthmate</h1>
         </div>
 
         {/* Navigation Items */}
         <div className="flex-1 flex flex-col justify-between p-4">
           <div className="space-y-1">
-            <p className="text-xs text-gray-400 uppercase tracking-wider px-4 py-2">
-              Health Tools
-            </p>
             <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-              <Activity className="w-5 h-5" />
-              <span>Monitor Health Trends</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-              <Bell className="w-5 h-5" />
-              <span>Health Alerts</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-              <UploadIcon className="w-5 h-5" />
-              <span>Upload Medical Reports</span>
+              <MessageSquarePlus className="w-5 h-5" />
+              <span>Start a new chat</span>
             </button>
           </div>
 
-          {/* Settings at Bottom */}
-          <div>
+          {/* Bottom section */}
+          <div className="space-y-1">
             <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
               <Settings className="w-5 h-5" />
               <span>Settings</span>
+            </button>
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
             </button>
           </div>
         </div>
