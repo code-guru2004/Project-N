@@ -302,91 +302,91 @@ const useSound = (src: string) => {
 
 
 interface GameSession {
-  date: string;
-  tapCount: number;
-  bloomCount: number;
-  missedTaps: number;
-  wrongTaps: number;
-  averageReactionTime: number;
+    date: string;
+    tapCount: number;
+    bloomCount: number;
+    missedTaps: number;
+    wrongTaps: number;
+    averageReactionTime: number;
 }
 
- function HistoryDrawer() {
-  const [history, setHistory] = useState<GameSession[]>([]);
-  const [bestScore, setBestScore] = useState<GameSession | null>(null);
+function HistoryDrawer() {
+    const [history, setHistory] = useState<GameSession[]>([]);
+    const [bestScore, setBestScore] = useState<GameSession | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = JSON.parse(localStorage.getItem('bloomGameHistory') || '[]');
-      const highScore = JSON.parse(localStorage.getItem('bloomGameBestStats') || 'null');
-      setHistory(stored);
-      setBestScore(highScore);
-    }
-  }, []);
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const stored = JSON.parse(localStorage.getItem('bloomGameHistory') || '[]');
+            const highScore = JSON.parse(localStorage.getItem('bloomGameBestStats') || 'null');
+            setHistory(stored);
+            setBestScore(highScore);
+        }
+    }, []);
 
-  return (
-    <Drawer>
-      <DrawerTrigger title='History'>
-        <History className='size-7' />
-      </DrawerTrigger>
+    return (
+        <Drawer>
+            <DrawerTrigger title='History'>
+                <History className='size-7' />
+            </DrawerTrigger>
 
-      <DrawerContent className="bg-gradient-to-br from-[#1f1b2e] via-[#2c223f] to-[#1a162a] text-white border-t border-purple-700">
-        <DrawerHeader>
-          <DrawerTitle className="text-purple-300 text-xl">🎮 Game History</DrawerTitle>
-          <DrawerDescription className="text-gray-400">
-            Here's your performance in past sessions:
-          </DrawerDescription>
-        </DrawerHeader>
+            <DrawerContent className="bg-gradient-to-br from-[#1f1b2e] via-[#2c223f] to-[#1a162a] text-white border-t border-purple-700">
+                <DrawerHeader>
+                    <DrawerTitle className="text-purple-300 text-xl">🎮 Game History</DrawerTitle>
+                    <DrawerDescription className="text-gray-400">
+                        Here's your performance in past sessions:
+                    </DrawerDescription>
+                </DrawerHeader>
 
-        {bestScore && bestScore.date && (
-          <div className="border border-pink-400 bg-[#3b2a3f] text-pink-200 rounded-2xl p-5 shadow-[0_0_20px_rgba(244,114,182,0.1)] mb-4 mx-4 flex items-center gap-4">
-            <div className="text-4xl md:text-8xl leading-none pt-1">🏆</div>
-            <div className="flex-1">
-              <p className="text-sm text-pink-300 font-semibold mb-3">
-                Best Performance — {new Date(bestScore.date).toLocaleString()}
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-1 gap-x-4 text-sm">
-                <StatItem label="🌼 Tap" value={bestScore.tapCount} />
-                <StatItem label="✅ Bloomed" value={bestScore.bloomCount} />
-                <StatItem label="🚫 Missed" value={bestScore.missedTaps} />
-                <StatItem label="❌ Wrong" value={bestScore.wrongTaps} />
-                <StatItem label="⚡ Avg Reaction Time" value={`${bestScore.averageReactionTime} ms`} span />
-              </div>
-            </div>
-          </div>
-        )}
+                {bestScore && bestScore.date && (
+                    <div className="border border-pink-400 bg-[#3b2a3f] text-pink-200 rounded-2xl p-5 shadow-[0_0_20px_rgba(244,114,182,0.1)] mb-4 mx-4 flex items-center gap-4">
+                        <div className="text-4xl md:text-8xl leading-none pt-1">🏆</div>
+                        <div className="flex-1">
+                            <p className="text-sm text-pink-300 font-semibold mb-3">
+                                Best Performance — {new Date(bestScore.date).toLocaleString()}
+                            </p>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-1 gap-x-4 text-sm">
+                                <StatItem label="🌼 Tap" value={bestScore.tapCount} />
+                                <StatItem label="✅ Bloomed" value={bestScore.bloomCount} />
+                                <StatItem label="🚫 Missed" value={bestScore.missedTaps} />
+                                <StatItem label="❌ Wrong" value={bestScore.wrongTaps} />
+                                <StatItem label="⚡ Avg Reaction Time" value={`${bestScore.averageReactionTime} ms`} span />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
-        {history.length === 0 ? (
-          <p className="text-center text-sm text-gray-400 mt-6">No games played yet.</p>
-        ) : (
-          <div className="px-4 pb-6 space-y-4 overflow-y-scroll">
-            {history.map((session, i) => (
-              <div
-                key={i}
-                className="border border-purple-700 bg-[#241c35] rounded-xl p-4 shadow-md"
-              >
-                <p className="text-sm text-gray-300 mb-2">
-                  📅 {new Date(session.date).toLocaleString()}
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <StatItem label="🌼 Tap" value={session.tapCount} />
-                  <StatItem label="✅ Bloomed" value={session.bloomCount} />
-                  <StatItem label="🚫 Missed" value={session.missedTaps} />
-                  <StatItem label="❌ Wrong" value={session.wrongTaps} />
-                  <StatItem label="⚡ Avg Time" value={`${session.averageReactionTime} ms`} span />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </DrawerContent>
-    </Drawer>
-  );
+                {history.length === 0 ? (
+                    <p className="text-center text-sm text-gray-400 mt-6">No games played yet.</p>
+                ) : (
+                    <div className="px-4 pb-6 space-y-4 overflow-y-scroll">
+                        {history.map((session, i) => (
+                            <div
+                                key={i}
+                                className="border border-purple-700 bg-[#241c35] rounded-xl p-4 shadow-md"
+                            >
+                                <p className="text-sm text-gray-300 mb-2">
+                                    📅 {new Date(session.date).toLocaleString()}
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <StatItem label="🌼 Tap" value={session.tapCount} />
+                                    <StatItem label="✅ Bloomed" value={session.bloomCount} />
+                                    <StatItem label="🚫 Missed" value={session.missedTaps} />
+                                    <StatItem label="❌ Wrong" value={session.wrongTaps} />
+                                    <StatItem label="⚡ Avg Time" value={`${session.averageReactionTime} ms`} span />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </DrawerContent>
+        </Drawer>
+    );
 }
 
 function StatItem({ label, value, span = false }: { label: string, value: string | number, span?: boolean }) {
-  return (
-    <div className={`flex items-center gap-1 ${span ? "col-span-2 sm:col-span-3" : ""}`}>
-      {label}: <span>{value}</span>
-    </div>
-  );
+    return (
+        <div className={`flex items-center gap-1 ${span ? "col-span-2 sm:col-span-3" : ""}`}>
+            {label}: <span>{value}</span>
+        </div>
+    );
 }

@@ -8,8 +8,24 @@ import Image from "next/image";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { Slider } from "@/components/ui/slider";
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import { History } from "lucide-react";
 
 const emotions: EmotionType[] = ["Happy", "Sad", "Love"];
+type TurnScore = {
+    turn: number;
+    responseTime: number;
+    isCorrect: boolean;
+};
 
 export default function GamePage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -23,12 +39,18 @@ export default function GamePage() {
     const [countdown, setCountdown] = useState<number | null>(null);
     const [showPlayAgain, setShowPlayAgain] = useState(false);
     const [volume, setVolume] = useState(1);
-    const [startTime, setStartTime] = useState<number | null>(null); 
-    const [responseTime, setResponseTime] = useState<number | null>(null); 
+    const [startTime, setStartTime] = useState<number | null>(null);
+    const [responseTime, setResponseTime] = useState<number | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+
+    const [turns, setTurns] = useState<TurnScore[]>([]);
+    const [turnNumber, setTurnNumber] = useState(1);
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [gameHistory, setGameHistory] = useState<TurnScore[]>([]);
 
     const startGame = () => {
         setResult(null);
+        setTurnNumber(1);
         setSelectedEmotion(null);
         const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
         const audios = emotionAudios[randomEmotion];
@@ -38,10 +60,16 @@ export default function GamePage() {
         setCurrentAudio(randomAudio);
         setStartTime(null); // reset
         setResponseTime(null);
+        setIsDialogOpen(false)
     };
 
 
     const handlePlayAgain = () => {
+        if (turnNumber >= 3) {
+            // setIsDialogOpen(true)
+            return;
+        } // stop at 3 turns
+        setTurnNumber((prev) => prev + 1);
         setShowPlayAgain(false);
         let seconds = 3;
         setCountdown(seconds);
@@ -62,9 +90,19 @@ export default function GamePage() {
             const timeTaken = Date.now() - startTime; // ⏱️ in ms
             setResponseTime(timeTaken);
             console.log(`⏱️ Response time: ${timeTaken}ms`);
+            const isCorrect = emotion === correctEmotion;
+            setTurns((prev) => [
+                ...prev,
+                {
+                    turn: prev.length + 1,
+                    responseTime: timeTaken,
+                    isCorrect,
+                },
+            ]);
         }
 
         if (emotion === correctEmotion) {
+
             setResult("✅ Correct!");
         } else {
             setResult(`❌ Wrong! It was ${correctEmotion}`);
@@ -72,6 +110,15 @@ export default function GamePage() {
 
         setShowPlayAgain(true);
     };
+
+    useEffect(() => {
+        if (turns.length === 3) {
+            const existing = JSON.parse(localStorage.getItem("gameSessions") || "[]");
+            const updated = [...existing, turns];
+            localStorage.setItem("gameSessions", JSON.stringify(updated));
+        }
+    }, [turns]);
+
 
     return (
         <div
@@ -91,7 +138,10 @@ export default function GamePage() {
                     />
                 ))}
             </>
+            <div className='absolute top-8 right-5 md:right-10'>
 
+                <HistoryDrawer />
+            </div>
             <motion.h1
                 className="text-4xl font-extrabold mb-6 text-center text-white tracking-wide"
                 initial={{ opacity: 0, y: -30 }}
@@ -170,6 +220,7 @@ export default function GamePage() {
                         onPlay={() => {
                             setStartTime(Date.now());
                         }}
+                        onEnded={() => setIsPlaying(false)}
                         layout="horizontal"
                         className="!bg-slate-700 !text-white !border-none !rounded-xl"
                     />
@@ -224,7 +275,37 @@ export default function GamePage() {
                 </div>
             )}
 
-       
+            {turns.length === 3 && (
+                <div className="mt-6 text-white text-center space-y-2">
+                    <h2 className="text-xl font-bold">🎉 Game Over</h2>
+                    <ul className="space-y-1 text-sm">
+                        {turns.map((t) => (
+                            <li key={t.turn}>
+                                Turn {t.turn}: {t.isCorrect ? "✅" : "❌"} – {t.responseTime / 1000}s
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="font-semibold mt-2">
+                        Accuracy:{" "}
+                        {Math.round(
+                            (turns.filter((t) => t.isCorrect).length / 3) * 100
+                        )}
+                        %
+                    </div>
+                    <button
+                        onClick={() => {
+                            setTurnNumber(1);
+                            setTurns([]);
+                            setResult(null);
+                            setSelectedEmotion(null);
+                            setCurrentAudio(null);
+                        }}
+                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+                    >
+                        🔄 Restart Game
+                    </button>
+                </div>
+            )}
 
             <AnimatePresence>
                 {result && (
@@ -235,7 +316,7 @@ export default function GamePage() {
                         exit={{ opacity: 0 }}
                     >
                         <div className="text-2xl font-semibold text-white mb-4">{result}</div>
-                        {showPlayAgain && (
+                        {turnNumber < 3 && showPlayAgain && (
                             <button
                                 onClick={handlePlayAgain}
                                 className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white text-lg font-medium rounded-xl shadow"
@@ -280,5 +361,90 @@ function MusicalNote({
         >
             <path d="M9 3v12a4 4 0 1 1-2-3.465V6h8V3H9z" />
         </motion.svg>
+    );
+}
+
+function HistoryDrawer() {
+    const [history, setHistory] = useState<TurnScore[][]>([]);
+
+
+    useEffect(() => {
+        const sessions = JSON.parse(localStorage.getItem("gameSessions") || "[]");
+        console.log("All game sessions:", sessions);
+        setHistory(sessions);
+    }, [])
+
+    return (
+        <Drawer>
+            <DrawerTrigger title='History'>
+                <History className='size-7' />
+            </DrawerTrigger>
+
+            <DrawerContent className="bg-gradient-to-br from-[#1f1b2e] via-[#2c223f] to-[#1a162a] text-white border-t border-purple-700">
+                <DrawerHeader>
+                    <DrawerTitle className="text-purple-300 text-xl">🎮 Game History</DrawerTitle>
+                    <DrawerDescription className="text-gray-400">
+                        Here's your performance in past sessions:
+                    </DrawerDescription>
+                </DrawerHeader>
+
+
+
+                {history.length === 0 ? (
+                    <p className="text-center text-sm text-gray-400 mt-6">No games played yet.</p>
+                ) : (
+                    <div className="px-4 pb-6 space-y-4 overflow-y-scroll">
+                        {history.map((session, i) => (
+                            <div
+                                key={i}
+                                className="border border-purple-700 bg-[#241c35] rounded-xl p-4 shadow-md"
+                            >
+                                <p className="text-purple-400 font-semibold mb-3 text-base sm:text-lg">
+                                    🎮 Game {i + 1}
+                                </p>
+                                <div className="font-semibold my-2 text-sm text-green-600">
+                                    {/* Accuracy calcucation */}
+                                    {
+                                    Math.round(
+                                        (session.filter((t) => t.isCorrect).length / 3) * 100
+                                    ) > 50 ? (
+                                        <span className="text-green-400">🎯 Accuracy : {Math.round(
+                                            (session.filter((t) => t.isCorrect).length / 3) * 100
+                                        )}%</span>
+                                    ) :<span className="text-red-400">🎯 Accuracy : {Math.round(
+                                        (session.filter((t) => t.isCorrect).length / 3) * 100
+                                    )}%</span>
+                                    
+                                    }
+                                    
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm sm:text-base">
+                                    {session.map((turn, j) => (
+                                        <div key={j} className="bg-[#33294a] p-3 rounded-lg">
+                                            <p>🌀 <span className="font-medium">Turn:</span> {turn.turn}</p>
+                                            <p>⏱️ <span className="font-medium">Time:</span> {turn.responseTime}ms</p>
+                                            <p>
+                                                ✅ <span className="font-medium">Correct:</span>{" "}
+                                                <span className={turn.isCorrect ? "text-green-400" : "text-red-400"}>
+                                                    {turn.isCorrect ? "Yes" : "No"}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                    </div>
+                )}
+            </DrawerContent>
+        </Drawer>
+    );
+}
+function StatItem({ label, value, span = false }: { label: string, value: string | number | boolean, span?: boolean }) {
+    return (
+        <div className={`flex items-center gap-1 ${span ? "col-span-2 sm:col-span-3" : ""}`}>
+            {label}: <span>{value}</span>
+        </div>
     );
 }
