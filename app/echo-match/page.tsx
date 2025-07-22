@@ -20,7 +20,18 @@ import {
 } from "@/components/ui/drawer"
 import { History } from "lucide-react";
 
-const emotions: EmotionType[] = ["Happy", "Sad", "Love"];
+export const emotions: EmotionType[] = [
+    'Happy',
+    'Sad',
+    'Romantic',
+    'Heartbreak',
+    'Motivational',
+    'Chill',
+    'Party',
+    'Dark',
+    'Spiritual'
+];
+
 type TurnScore = {
     turn: number;
     responseTime: number;
@@ -380,7 +391,8 @@ function HistoryDrawer() {
                 <History className='size-7' />
             </DrawerTrigger>
 
-            <DrawerContent className="bg-gradient-to-br from-[#1f1b2e] via-[#2c223f] to-[#1a162a] text-white border-t border-purple-700">
+            <DrawerContent className="bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0c1e35] text-white border-t border-blue-700">
+
                 <DrawerHeader>
                     <DrawerTitle className="text-purple-300 text-xl">🎮 Game History</DrawerTitle>
                     <DrawerDescription className="text-gray-400">
@@ -397,30 +409,31 @@ function HistoryDrawer() {
                         {history.map((session, i) => (
                             <div
                                 key={i}
-                                className="border border-purple-700 bg-[#241c35] rounded-xl p-4 shadow-md"
+                                className="border border-blue-700 bg-[#0f172a] rounded-xl p-4 shadow-md"
                             >
+
                                 <p className="text-purple-400 font-semibold mb-3 text-base sm:text-lg">
                                     🎮 Game {i + 1}
                                 </p>
                                 <div className="font-semibold my-2 text-sm text-green-600">
                                     {/* Accuracy calcucation */}
                                     {
-                                    Math.round(
-                                        (session.filter((t) => t.isCorrect).length / 3) * 100
-                                    ) > 50 ? (
-                                        <span className="text-green-400">🎯 Accuracy : {Math.round(
+                                        Math.round(
+                                            (session.filter((t) => t.isCorrect).length / 3) * 100
+                                        ) > 50 ? (
+                                            <span className="text-green-400">🎯 Accuracy : {Math.round(
+                                                (session.filter((t) => t.isCorrect).length / 3) * 100
+                                            )}%</span>
+                                        ) : <span className="text-red-400">🎯 Accuracy : {Math.round(
                                             (session.filter((t) => t.isCorrect).length / 3) * 100
                                         )}%</span>
-                                    ) :<span className="text-red-400">🎯 Accuracy : {Math.round(
-                                        (session.filter((t) => t.isCorrect).length / 3) * 100
-                                    )}%</span>
-                                    
+
                                     }
-                                    
+
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm sm:text-base">
                                     {session.map((turn, j) => (
-                                        <div key={j} className="bg-[#33294a] p-3 rounded-lg">
+                                        <div key={j} className="bg-[#2a294a] p-3 rounded-lg">
                                             <p>🌀 <span className="font-medium">Turn:</span> {turn.turn}</p>
                                             <p>⏱️ <span className="font-medium">Time:</span> {turn.responseTime}ms</p>
                                             <p>
