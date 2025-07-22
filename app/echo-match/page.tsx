@@ -433,11 +433,18 @@ function HistoryDrawer() {
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm sm:text-base">
                                     {session.map((turn, j) => (
-                                        <div key={j} className="bg-[#2a294a] p-3 rounded-lg">
-                                            <p>🌀 <span className="font-medium">Turn:</span> {turn.turn}</p>
-                                            <p>⏱️ <span className="font-medium">Time:</span> {turn.responseTime}ms</p>
+                                        <div
+                                            key={j}
+                                            className="bg-[#162037] border border-blue-700 text-white p-3 rounded-lg shadow-md"
+                                        >
                                             <p>
-                                                ✅ <span className="font-medium">Correct:</span>{" "}
+                                                🌀 <span className="font-medium text-blue-300">Turn:</span> {turn.turn}
+                                            </p>
+                                            <p>
+                                                ⏱️ <span className="font-medium text-blue-300">Time:</span> {turn.responseTime}ms
+                                            </p>
+                                            <p>
+                                                ✅ <span className="font-medium text-blue-300">Correct:</span>{" "}
                                                 <span className={turn.isCorrect ? "text-green-400" : "text-red-400"}>
                                                     {turn.isCorrect ? "Yes" : "No"}
                                                 </span>
@@ -447,7 +454,6 @@ function HistoryDrawer() {
                                 </div>
                             </div>
                         ))}
-
                     </div>
                 )}
             </DrawerContent>
